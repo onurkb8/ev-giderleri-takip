@@ -1,0 +1,12 @@
+
+{
+  "name": "Ev Giderlerim",
+  "short_name": "Giderlerim",
+  "description": "Ev giderlerini ve ödeme tarihlerini takip et.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f7f4",
+  "theme_color": "#166534",
+  "lang": "tr"
+}
