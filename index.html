@@ -1,75 +1,58 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <link rel="manifest" href="./manifest.json">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#166534">
+  <link rel="manifest" href="./manifest.json">
   <title>Ev Giderlerim</title>
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; padding: 16px; font-family: Arial, sans-serif;
-      background: #f3f6f3; color: #1f2937;
-    }
-    header {
-      background: #166534; color: white; padding: 24px;
-      border-radius: 18px; margin-bottom: 18px;
-    }
-    header h1 { margin: 0 0 8px; font-size: 27px; }
-    header p { margin: 0; font-size: 14px; }
-    .card {
-      background: white; padding: 18px; margin-bottom: 16px;
-      border-radius: 16px; box-shadow: 0 2px 8px #0000000d;
-    }
-    .total {
-      font-size: 28px; font-weight: bold; color: #166534;
-      margin-top: 10px;
-    }
-    label {
-      display: block; margin: 14px 0 6px;
-      font-weight: bold; font-size: 14px;
-    }
-    input, select, button {
-      width: 100%; padding: 12px; border-radius: 9px; font-size: 16px;
-    }
-    input, select { border: 1px solid #d1d5db; background: white; }
-    button {
-      margin-top: 10px; border: none; background: #166534;
-      color: white; font-weight: bold; cursor: pointer;
-    }
-    .secondary { background: #e5e7eb; color: #1f2937; }
-    .delete { background: #b91c1c; }
-    .note { color: #6b7280; font-size: 13px; line-height: 1.5; }
-    .expense {
-      border: 1px solid #e5e7eb; border-radius: 12px;
-      padding: 14px; margin-top: 12px;
-    }
-    .expense h3 { margin: 0 0 8px; }
-    .expense p { margin: 6px 0; font-size: 14px; overflow-wrap: anywhere; }
-    .status { font-weight: bold; }
-    .hidden { display: none; }
-    .empty { color: #6b7280; text-align: center; padding: 16px 0; }
-    .section-title { margin-top: 24px; }
+    *{box-sizing:border-box}body{margin:0;padding:16px;font-family:Arial,sans-serif;background:#f3f6f3;color:#1f2937}
+    header{background:#166534;color:#fff;padding:24px;border-radius:18px;margin-bottom:18px}header h1{margin:0 0 8px;font-size:27px}header p{margin:0;font-size:14px}
+    .card{background:#fff;padding:18px;margin-bottom:16px;border-radius:16px;box-shadow:0 2px 8px #0000000d}.total{font-size:28px;font-weight:bold;color:#166534;margin-top:10px}
+    label{display:block;margin:14px 0 6px;font-weight:bold;font-size:14px}input,select,button{width:100%;padding:12px;border-radius:9px;font-size:16px}
+    input,select{border:1px solid #d1d5db;background:#fff}button{margin-top:10px;border:none;background:#166534;color:#fff;font-weight:bold;cursor:pointer}
+    .secondary{background:#e5e7eb;color:#1f2937}.delete{background:#b91c1c}.note{color:#6b7280;font-size:13px;line-height:1.5}.expense{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:12px}
+    .expense h3{margin:0 0 8px}.expense p{margin:6px 0;font-size:14px;overflow-wrap:anywhere}.status{font-weight:bold}.hidden{display:none}.empty{color:#6b7280;text-align:center;padding:16px 0}.section-title{margin-top:24px}
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <header>
-    <h1>🏡 Ev Giderlerim</h1>
-    <p>Faturalarını ve ödemelerini kolayca takip et.</p>
-  </header>
+  <section class="card" id="authCard">
+    <h2>Hesabım</h2>
+    <p>E-posta adresinle kayıt ol veya hesabına giriş yap.</p>
+    <label for="authEmail">E-posta adresi</label>
+    <input type="email" id="authEmail" placeholder="ornek@mail.com" autocomplete="email">
+    <label for="authPassword">Şifre</label>
+    <input type="password" id="authPassword" placeholder="En az 6 karakter" autocomplete="current-password">
+    <button type="button" id="signUpButton">Kayıt ol</button>
+    <button type="button" id="signInButton">Giriş yap</button>
+    <button type="button" class="secondary" id="forgotPasswordButton">Şifremi unuttum</button>
+    <p id="authMessage" class="note" role="status"></p>
+  </section>
+
+  <section class="card hidden" id="signedInCard">
+    <p id="signedInMessage"></p>
+    <button type="button" class="secondary" id="signOutButton">Çıkış yap</button>
+  </section>
+
+  <section class="card hidden" id="resetPasswordCard">
+    <h2>Yeni şifre belirle</h2>
+    <p class="note">Hesabın için yeni bir şifre oluştur.</p>
+    <label for="newPassword">Yeni şifre</label>
+    <input type="password" id="newPassword" placeholder="En az 6 karakter" minlength="6" autocomplete="new-password">
+    <label for="confirmNewPassword">Yeni şifreyi tekrar gir</label>
+    <input type="password" id="confirmNewPassword" placeholder="Yeni şifreni tekrar yaz" minlength="6" autocomplete="new-password">
+    <button type="button" id="updatePasswordButton">Şifremi güncelle</button>
+    <p id="resetPasswordMessage" class="note" role="status"></p>
+  </section>
+
+  <header><h1>🏡 Ev Giderlerim</h1><p>Faturalarını ve ödemelerini kolayca takip et.</p></header>
 
   <section class="card">
-    <div>Bu ayki toplam giderim</div>
-    <div class="total" id="monthlyTotal">₺0,00</div>
-    <p id="monthlyInfo">Bu ay henüz gider eklenmedi.</p>
-    <p class="note">Toplam, bu aya ait ödenmiş ve ödenmemiş giderleri kapsar.</p>
-    <hr style="border:0;border-top:1px solid #e5e7eb;margin:18px 0;">
-
-<div>Bu ay kalan ödeme tutarım</div>
-<div class="total" id="monthlyRemaining" style="color:#b91c1c;">₺0,00</div>
-<p class="note">Yalnızca bu ay henüz ödenmemiş giderler.</p>
+    <div>Bu ayki toplam giderim</div><div class="total" id="monthlyTotal">₺0,00</div><p id="monthlyInfo">Bu ay henüz gider eklenmedi.</p>
+    <p class="note">Toplam, bu aya ait ödenmiş ve ödenmemiş giderleri kapsar.</p><hr style="border:0;border-top:1px solid #e5e7eb;margin:18px 0;">
+    <div>Bu ay kalan ödeme tutarım</div><div class="total" id="monthlyRemaining" style="color:#b91c1c;">₺0,00</div><p class="note">Yalnızca bu ay henüz ödenmemiş giderler.</p>
   </section>
 
   <section class="card">
@@ -77,481 +60,61 @@
     <form id="expenseForm">
       <label for="expenseType">1. Gider türü</label>
       <select id="expenseType" required>
-        <option value="elektrik">Elektrik</option>
-        <option value="su">Su</option>
-        <option value="dogalgaz">Doğalgaz</option>
-        <option value="internet">İnternet</option>
-        <option value="telefon">Telefon</option>
-        <option value="kira">Kira</option>
-        <option value="aidat">Apartman aidatı</option>
-        <option value="taksit">Kredi / Taksit</option>
-        <option value="sigorta">Sigorta</option>
-        <option value="abonelik">Abonelikler</option>
-        <option value="diger">Diğer giderler</option>
+        <option value="elektrik">Elektrik</option><option value="su">Su</option><option value="dogalgaz">Doğalgaz</option><option value="internet">İnternet</option><option value="telefon">Telefon</option><option value="kira">Kira</option><option value="aidat">Apartman aidatı</option><option value="taksit">Kredi / Taksit</option><option value="sigorta">Sigorta</option><option value="abonelik">Abonelikler</option><option value="diger">Diğer giderler</option>
       </select>
-
-      <label for="paymentType">2. Ödeme türü</label>
-      <select id="paymentType" disabled>
-        <option>Fatura</option>
-      </select>
-      <p class="note">Ödeme türü otomatik belirlenir.</p>
-
-      <div id="installmentFields" class="hidden">
-        <label for="installmentCount">Toplam ödeme sayısı</label>
-        <input id="installmentCount" type="number" min="1" max="600"
-               step="1" placeholder="Örn. 12">
-        <p class="note">
-          Her ay için ayrı ödeme kaydı oluşturulur. İlk tarih 5 Kasım ise
-          sonraki ödemeler her ayın 5'inde planlanır.
-        </p>
-      </div>
-
-      <label for="amount">Aylık / fatura tutarı (TL)</label>
-      <input id="amount" type="number" min="0.01" step="0.01"
-             placeholder="Örn. 850" required>
-
-      <label for="dueDate">İlk / son ödeme tarihi</label>
-      <input id="dueDate" type="date" required>
-
+      <label for="paymentType">2. Ödeme türü</label><select id="paymentType" disabled><option>Fatura</option></select><p class="note">Ödeme türü otomatik belirlenir.</p>
+      <div id="installmentFields" class="hidden"><label for="installmentCount">Toplam ödeme sayısı</label><input id="installmentCount" type="number" min="1" max="600" step="1" placeholder="Örn. 12"><p class="note">Her ay için ayrı ödeme kaydı oluşturulur. İlk tarih 5 Kasım ise sonraki ödemeler her ayın 5'inde planlanır.</p></div>
+      <label for="amount">Aylık / fatura tutarı (TL)</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="Örn. 850" required>
+      <label for="dueDate">İlk / son ödeme tarihi</label><input id="dueDate" type="date" required>
       <button type="submit">Gideri kaydet</button>
     </form>
   </section>
 
-  <section class="card">
-    <h2>Giderlerim</h2>
-    <p class="note">
-      Önceden kaydettiğin giderler burada korunur. Yeni kira, kredi ve
-      sigorta kayıtlarının her ayı ayrı ayrı listelenir.
-    </p>
-    <div id="expenseList"></div>
-  </section>
+  <section class="card"><h2>Giderlerim</h2><p class="note">Önceden kaydettiğin giderler burada korunur. Yeni kira, kredi ve sigorta kayıtlarının her ayı ayrı ayrı listelenir.</p><div id="expenseList"></div></section>
 
 <script>
 "use strict";
-
 const $ = id => document.getElementById(id);
-
-const expenseType = $("expenseType");
-const paymentType = $("paymentType");
-const installmentFields = $("installmentFields");
-const installmentCount = $("installmentCount");
-const expenseForm = $("expenseForm");
-const expenseList = $("expenseList");
-
-const typeNames = {
-  elektrik: "Elektrik",
-  su: "Su",
-  dogalgaz: "Doğalgaz",
-  internet: "İnternet",
-  telefon: "Telefon",
-  kira: "Kira",
-  aidat: "Apartman aidatı",
-  taksit: "Kredi / Taksit",
-  sigorta: "Sigorta",
-  abonelik: "Abonelikler",
-  diger: "Diğer giderler"
-};
-
-const paymentTypes = {
-  elektrik: "Fatura",
-  su: "Fatura",
-  dogalgaz: "Fatura",
-  internet: "Fatura",
-  telefon: "Fatura",
-  kira: "Kira ödemesi",
-  aidat: "Aidat",
-  taksit: "Taksit",
-  sigorta: "Sigorta ödemesi",
-  abonelik: "Abonelik",
-  diger: "Diğer ödeme"
-};
-
-const installmentTypes = ["kira", "taksit", "sigorta"];
-
-function readArray(key) {
-  try {
-    const data = JSON.parse(localStorage.getItem(key) || "[]");
-    return Array.isArray(data) ? data : [];
-  } catch (error) {
-    return [];
-  }
-}
-
-/*
-  Eski kayıtlar aynı anahtarda bırakılır.
-  Yeni aylık ödeme kayıtları ayrı anahtarda tutulur.
-*/
-let expenses = readArray("evGiderleri");
-let monthlyPayments = readArray("evGiderleriAylikPlanlar");
-
-function saveExpenses() {
-  localStorage.setItem("evGiderleri", JSON.stringify(expenses));
-}
-
-function saveMonthlyPayments() {
-  localStorage.setItem(
-    "evGiderleriAylikPlanlar",
-    JSON.stringify(monthlyPayments)
-  );
-}
-
-function updateFields() {
-  const type = expenseType.value;
-  paymentType.innerHTML = "";
-
-  const option = document.createElement("option");
-  option.textContent = paymentTypes[type];
-  paymentType.appendChild(option);
-
-  const hasInstallments = installmentTypes.includes(type);
-  installmentFields.classList.toggle("hidden", !hasInstallments);
-  installmentCount.required = hasInstallments;
-}
-
-function formatMoney(amount) {
-  return Number(amount).toLocaleString("tr-TR", {
-    style: "currency",
-    currency: "TRY"
-  });
-}
-
-function formatDate(date) {
-  if (!date) return "Tarih belirtilmemiş";
-  const parts = date.split("-").map(Number);
-  if (parts.length !== 3 || parts.some(n => !n)) return date;
-  return new Date(parts[0], parts[1] - 1, parts[2])
-    .toLocaleDateString("tr-TR");
-}
-
-function dateString(year, month, day) {
-  const lastDay = new Date(year, month + 1, 0).getDate();
-  const safeDay = Math.min(day, lastDay);
-  return [
-    year,
-    String(month + 1).padStart(2, "0"),
-    String(safeDay).padStart(2, "0")
-  ].join("-");
-}
-
-function monthlyDate(startDate, offset) {
-  const [year, month, day] = startDate.split("-").map(Number);
-  const firstOfMonth = new Date(year, month - 1 + offset, 1);
-  return dateString(
-    firstOfMonth.getFullYear(),
-    firstOfMonth.getMonth(),
-    day
-  );
-}
-
-function addText(parent, tag, text, className = "") {
-  const el = document.createElement(tag);
-  el.textContent = text;
-  if (className) el.className = className;
-  parent.appendChild(el);
-  return el;
-}
-
-function addButton(parent, text, className, action) {
-  const button = document.createElement("button");
-  button.textContent = text;
-  button.className = className;
-  button.type = "button";
-  button.addEventListener("click", action);
-  parent.appendChild(button);
-}
-
-function makeCard(titleText) {
-  const item = document.createElement("div");
-  item.className = "expense";
-  addText(item, "h3", titleText);
-  return item;
-}
-
-function renderLegacyExpense(expense) {
-  const item = makeCard(typeNames[expense.type] || expense.type || "Gider");
-
-  addText(item, "p", "Ödeme türü: " + (expense.payment || "Belirtilmemiş"));
-  addText(item, "p", "Tutar: " + formatMoney(expense.amount));
-  addText(item, "p", "Son ödeme tarihi: " + formatDate(expense.dueDate));
-
-  if (expense.installmentCount) {
-    addText(
-      item,
-      "p",
-      "Eski kayıt — kalan ödeme: " +
-        (expense.remainingInstallments ?? expense.installmentCount) +
-        " / " + expense.installmentCount
-    );
-  }
-
-  const status = addText(
-    item, "p",
-    expense.paid ? "Durum: Ödendi" : "Durum: Ödenmedi",
-    "status"
-  );
-  status.style.color = expense.paid ? "#166534" : "#b91c1c";
-
-  addButton(item,
-    expense.paid ? "Ödenmedi olarak işaretle" : "Ödendi olarak işaretle",
-    "secondary",
-    () => {
-      const index = expenses.findIndex(e => e.id === expense.id);
-      if (index < 0) return;
-      expenses[index].paid = !expenses[index].paid;
-      saveExpenses();
-      renderExpenses();
-    }
-  );
-
-  addButton(item, "Gideri sil", "delete", () => {
-    if (!confirm("Bu eski gider kaydını silmek istiyor musun?")) return;
-    expenses = expenses.filter(e => e.id !== expense.id);
-    saveExpenses();
-    renderExpenses();
-  });
-
-  return item;
-}
-
-function renderMonthlyPayment(payment) {
-  const title = (typeNames[payment.type] || payment.type) +
-    " — " + payment.installmentNumber + ". ödeme";
-  const item = makeCard(title);
-
-  addText(item, "p", "Ödeme türü: " + payment.payment);
-  addText(item, "p", "Tutar: " + formatMoney(payment.amount));
-  addText(item, "p", "Son ödeme tarihi: " + formatDate(payment.dueDate));
-  addText(
-    item, "p",
-    "Ödeme planı: " + payment.installmentNumber +
-      " / " + payment.totalInstallments
-  );
-
-  const status = addText(
-    item, "p",
-    payment.paid ? "Durum: Ödendi" : "Durum: Ödenmedi",
-    "status"
-  );
-  status.style.color = payment.paid ? "#166534" : "#b91c1c";
-
-  addButton(
-    item,
-    payment.paid ? "Ödenmedi olarak işaretle" : "Ödendi olarak işaretle",
-    "secondary",
-    () => {
-      const index = monthlyPayments.findIndex(p => p.id === payment.id);
-      if (index < 0) return;
-      monthlyPayments[index].paid = !monthlyPayments[index].paid;
-      saveMonthlyPayments();
-      renderExpenses();
-    }
-  );
-
-  addButton(item, "Bu ayın kaydını sil", "delete", () => {
-    if (!confirm("Yalnızca bu ayın ödeme kaydını silmek istiyor musun?")) return;
-    monthlyPayments = monthlyPayments.filter(p => p.id !== payment.id);
-    saveMonthlyPayments();
-    renderExpenses();
-  });
-
-  return item;
-}
-
-
-function renderExpenses() {
-  expenseList.innerHTML = "";
-
-  const oldTitle = addText(expenseList, "h3", "Önceden kayıtlı giderler");
-  oldTitle.className = "section-title";
-
-  if (expenses.length === 0) {
-    addText(expenseList, "p", "Önceden kayıtlı gider bulunmuyor.", "empty");
-  } else {
-    expenses.forEach(expense => {
-      expenseList.appendChild(renderLegacyExpense(expense));
-    });
-  }
-
-  const planTitle = addText(expenseList, "h3", "Aylık ödeme planları");
-  planTitle.className = "section-title";
-
-  // Aynı plana ait aylık kayıtları tek bir grupta toplar.
-  const plans = new Map();
-
-  monthlyPayments.forEach(payment => {
-    const key = payment.planId || payment.id;
-    if (!plans.has(key)) plans.set(key, []);
-    plans.get(key).push(payment);
-  });
-
-  if (plans.size === 0) {
-    addText(
-      expenseList, "p",
-      "Henüz yeni bir aylık ödeme planı oluşturulmadı.",
-      "empty"
-    );
-  } else {
-    plans.forEach(payments => {
-      payments.sort((a, b) =>
-        a.installmentNumber - b.installmentNumber
-      );
-
-      // Yalnızca sıradaki ödenmemiş taksit gösterilir.
-      const nextPayment = payments.find(payment => !payment.paid);
-
-      if (nextPayment) {
-        expenseList.appendChild(renderMonthlyPayment(nextPayment));
-      } else {
-        const completed = makeCard(
-          (typeNames[payments[0].type] || payments[0].type) +
-          " — Ödeme planı tamamlandı"
-        );
-
-        addText(
-          completed,
-          "p",
-          "Ödeme planı: " + payments.length + " / " + payments.length
-        );
-
-        addButton(completed, "Planı sil", "delete", () => {
-          if (!confirm("Bu tamamlanmış ödeme planını silmek istiyor musun?")) {
-            return;
-          }
-
-          const planId = payments[0].planId;
-          monthlyPayments = monthlyPayments.filter(payment =>
-            planId ? payment.planId !== planId : payment.id !== payments[0].id
-          );
-
-          saveMonthlyPayments();
-          renderExpenses();
-        });
-
-        expenseList.appendChild(completed);
-      }
-    });
-  }
-
-  const now = new Date();
-  const monthPrefix =
-    now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
-
-  const oldThisMonth = expenses.filter(e =>
-    typeof e.dueDate === "string" && e.dueDate.startsWith(monthPrefix)
-  );
-
-  // Aylık toplam hesaplaması için planların bütün ödeme kayıtları kullanılır.
-  const newThisMonth = monthlyPayments.filter(p =>
-    typeof p.dueDate === "string" && p.dueDate.startsWith(monthPrefix)
-  );
-
-  const totalCount = oldThisMonth.length + newThisMonth.length;
-const totalAmount =
-  oldThisMonth.reduce((sum, e) => sum + Number(e.amount || 0), 0) +
-  newThisMonth.reduce((sum, p) => sum + Number(p.amount || 0), 0);
-
-const unpaidOldAmount = oldThisMonth
-  .filter(e => !e.paid)
-  .reduce((sum, e) => sum + Number(e.amount || 0), 0);
-
-const unpaidPlanAmount = newThisMonth
-  .filter(p => !p.paid)
-  .reduce((sum, p) => sum + Number(p.amount || 0), 0);
-
-const remainingAmount = unpaidOldAmount + unpaidPlanAmount;
-
-$("monthlyTotal").textContent = formatMoney(totalAmount);
-$("monthlyInfo").textContent = totalCount + " gider / ödeme kaydı";
-$("monthlyRemaining").textContent = formatMoney(remainingAmount);
-}
-
-
-expenseType.addEventListener("change", updateFields);
-
-expenseForm.addEventListener("submit", event => {
-  event.preventDefault();
-
-  const type = expenseType.value;
-  const amount = Number($("amount").value);
-  const dueDate = $("dueDate").value;
-
-  if (!Number.isFinite(amount) || amount <= 0 || !dueDate) {
-    alert("Lütfen geçerli bir tutar ve tarih gir.");
-    return;
-  }
-
-  if (installmentTypes.includes(type)) {
-    const count = Number(installmentCount.value);
-
-    if (!Number.isInteger(count) || count < 1 || count > 600) {
-      alert("Lütfen 1 ile 600 arasında geçerli bir ödeme sayısı gir.");
-      return;
-    }
-
-    if (!confirm(
-      count + " ayrı aylık ödeme kaydı oluşturulacak. Devam edilsin mi?"
-    )) return;
-
-    const planId =
-      Date.now().toString() + Math.random().toString(16).slice(2);
-
-    const [startYear, startMonth, startDay] = dueDate.split("-").map(Number);
-
-    for (let i = 0; i < count; i++) {
-      const paymentDate = monthlyDate(dueDate, i);
-      monthlyPayments.push({
-        id: planId + "-" + (i + 1),
-        planId: planId,
-        type: type,
-        payment: paymentTypes[type],
-        amount: amount,
-        dueDate: paymentDate,
-        paid: false,
-        installmentNumber: i + 1,
-        totalInstallments: count,
-        originalDay: startDay,
-        startYear: startYear,
-        startMonth: startMonth
-      });
-    }
-
-    saveMonthlyPayments();
-  } else {
-    expenses.push({
-      id: Date.now().toString() + Math.random().toString(16).slice(2),
-      type: type,
-      payment: paymentTypes[type],
-      amount: amount,
-      dueDate: dueDate,
-      paid: false,
-      installmentCount: null,
-      remainingInstallments: null
-    });
-
-    saveExpenses();
-  }
-
-  renderExpenses();
-  expenseForm.reset();
-  updateFields();
-  alert("Gider kaydedildi!");
-});
-
-updateFields();
-renderExpenses();
+const expenseType = $("expenseType"), paymentType = $("paymentType"), installmentFields = $("installmentFields"), installmentCount = $("installmentCount"), expenseForm = $("expenseForm"), expenseList = $("expenseList");
+const typeNames = {elektrik:"Elektrik",su:"Su",dogalgaz:"Doğalgaz",internet:"İnternet",telefon:"Telefon",kira:"Kira",aidat:"Apartman aidatı",taksit:"Kredi / Taksit",sigorta:"Sigorta",abonelik:"Abonelikler",diger:"Diğer giderler"};
+const paymentTypes = {elektrik:"Fatura",su:"Fatura",dogalgaz:"Fatura",internet:"Fatura",telefon:"Fatura",kira:"Kira ödemesi",aidat:"Aidat",taksit:"Taksit",sigorta:"Sigorta ödemesi",abonelik:"Abonelik",diger:"Diğer ödeme"};
+const installmentTypes = ["kira","taksit","sigorta"];
+function readArray(key){try{const data=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(data)?data:[]}catch(error){return []}}
+let expenses=readArray("evGiderleri"), monthlyPayments=readArray("evGiderleriAylikPlanlar");
+function saveExpenses(){localStorage.setItem("evGiderleri",JSON.stringify(expenses))}
+function saveMonthlyPayments(){localStorage.setItem("evGiderleriAylikPlanlar",JSON.stringify(monthlyPayments))}
+function updateFields(){const type=expenseType.value;paymentType.innerHTML="";const option=document.createElement("option");option.textContent=paymentTypes[type];paymentType.appendChild(option);const hasInstallments=installmentTypes.includes(type);installmentFields.classList.toggle("hidden",!hasInstallments);installmentCount.required=hasInstallments}
+function formatMoney(amount){return Number(amount).toLocaleString("tr-TR",{style:"currency",currency:"TRY"})}
+function formatDate(date){if(!date)return "Tarih belirtilmemiş";const parts=date.split("-").map(Number);if(parts.length!==3||parts.some(n=>!n))return date;return new Date(parts[0],parts[1]-1,parts[2]).toLocaleDateString("tr-TR")}
+function dateString(year,month,day){const lastDay=new Date(year,month+1,0).getDate();const safeDay=Math.min(day,lastDay);return [year,String(month+1).padStart(2,"0"),String(safeDay).padStart(2,"0")].join("-")}
+function monthlyDate(startDate,offset){const [year,month,day]=startDate.split("-").map(Number);const firstOfMonth=new Date(year,month-1+offset,1);return dateString(firstOfMonth.getFullYear(),firstOfMonth.getMonth(),day)}
+function addText(parent,tag,text,className=""){const el=document.createElement(tag);el.textContent=text;if(className)el.className=className;parent.appendChild(el);return el}
+function addButton(parent,text,className,action){const button=document.createElement("button");button.textContent=text;button.className=className;button.type="button";button.addEventListener("click",action);parent.appendChild(button)}
+function makeCard(titleText){const item=document.createElement("div");item.className="expense";addText(item,"h3",titleText);return item}
+function renderLegacyExpense(expense){const item=makeCard(typeNames[expense.type]||expense.type||"Gider");addText(item,"p","Ödeme türü: "+(expense.payment||"Belirtilmemiş"));addText(item,"p","Tutar: "+formatMoney(expense.amount));addText(item,"p","Son ödeme tarihi: "+formatDate(expense.dueDate));if(expense.installmentCount)addText(item,"p","Eski kayıt — kalan ödeme: "+(expense.remainingInstallments??expense.installmentCount)+" / "+expense.installmentCount);const status=addText(item,"p",expense.paid?"Durum: Ödendi":"Durum: Ödenmedi","status");status.style.color=expense.paid?"#166534":"#b91c1c";addButton(item,expense.paid?"Ödenmedi olarak işaretle":"Ödendi olarak işaretle","secondary",()=>{const index=expenses.findIndex(e=>e.id===expense.id);if(index<0)return;expenses[index].paid=!expenses[index].paid;saveExpenses();renderExpenses()});addButton(item,"Gideri sil","delete",()=>{if(!confirm("Bu eski gider kaydını silmek istiyor musun?"))return;expenses=expenses.filter(e=>e.id!==expense.id);saveExpenses();renderExpenses()});return item}
+function renderMonthlyPayment(payment){const title=(typeNames[payment.type]||payment.type)+" — "+payment.installmentNumber+". ödeme";const item=makeCard(title);addText(item,"p","Ödeme türü: "+payment.payment);addText(item,"p","Tutar: "+formatMoney(payment.amount));addText(item,"p","Son ödeme tarihi: "+formatDate(payment.dueDate));addText(item,"p","Ödeme planı: "+payment.installmentNumber+" / "+payment.totalInstallments);const status=addText(item,"p",payment.paid?"Durum: Ödendi":"Durum: Ödenmedi","status");status.style.color=payment.paid?"#166534":"#b91c1c";addButton(item,payment.paid?"Ödenmedi olarak işaretle":"Ödendi olarak işaretle","secondary",()=>{const index=monthlyPayments.findIndex(p=>p.id===payment.id);if(index<0)return;monthlyPayments[index].paid=!monthlyPayments[index].paid;saveMonthlyPayments();renderExpenses()});addButton(item,"Bu ayın kaydını sil","delete",()=>{if(!confirm("Yalnızca bu ayın ödeme kaydını silmek istiyor musun?"))return;monthlyPayments=monthlyPayments.filter(p=>p.id!==payment.id);saveMonthlyPayments();renderExpenses()});return item}
+function renderExpenses(){expenseList.innerHTML="";const oldTitle=addText(expenseList,"h3","Önceden kayıtlı giderler");oldTitle.className="section-title";if(expenses.length===0)addText(expenseList,"p","Önceden kayıtlı gider bulunmuyor.","empty");else expenses.forEach(expense=>expenseList.appendChild(renderLegacyExpense(expense)));const planTitle=addText(expenseList,"h3","Aylık ödeme planları");planTitle.className="section-title";const plans=new Map();monthlyPayments.forEach(payment=>{const key=payment.planId||payment.id;if(!plans.has(key))plans.set(key,[]);plans.get(key).push(payment)});if(plans.size===0)addText(expenseList,"p","Henüz yeni bir aylık ödeme planı oluşturulmadı.","empty");else plans.forEach(payments=>{payments.sort((a,b)=>a.installmentNumber-b.installmentNumber);const nextPayment=payments.find(payment=>!payment.paid);if(nextPayment)expenseList.appendChild(renderMonthlyPayment(nextPayment));else{const completed=makeCard((typeNames[payments[0].type]||payments[0].type)+" — Ödeme planı tamamlandı");addText(completed,"p","Ödeme planı: "+payments.length+" / "+payments.length);addButton(completed,"Planı sil","delete",()=>{if(!confirm("Bu tamamlanmış ödeme planını silmek istiyor musun?"))return;const planId=payments[0].planId;monthlyPayments=monthlyPayments.filter(payment=>planId?payment.planId!==planId:payment.id!==payments[0].id);saveMonthlyPayments();renderExpenses()});expenseList.appendChild(completed)}});const now=new Date();const monthPrefix=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");const oldThisMonth=expenses.filter(e=>typeof e.dueDate==="string"&&e.dueDate.startsWith(monthPrefix));const newThisMonth=monthlyPayments.filter(p=>typeof p.dueDate==="string"&&p.dueDate.startsWith(monthPrefix));const totalCount=oldThisMonth.length+newThisMonth.length;const totalAmount=oldThisMonth.reduce((sum,e)=>sum+Number(e.amount||0),0)+newThisMonth.reduce((sum,p)=>sum+Number(p.amount||0),0);const unpaidOldAmount=oldThisMonth.filter(e=>!e.paid).reduce((sum,e)=>sum+Number(e.amount||0),0);const unpaidPlanAmount=newThisMonth.filter(p=>!p.paid).reduce((sum,p)=>sum+Number(p.amount||0),0);$("monthlyTotal").textContent=formatMoney(totalAmount);$("monthlyInfo").textContent=totalCount+" gider / ödeme kaydı";$("monthlyRemaining").textContent=formatMoney(unpaidOldAmount+unpaidPlanAmount)}
+expenseType.addEventListener("change",updateFields);
+expenseForm.addEventListener("submit",event=>{event.preventDefault();const type=expenseType.value,amount=Number($("amount").value),dueDate=$("dueDate").value;if(!Number.isFinite(amount)||amount<=0||!dueDate){alert("Lütfen geçerli bir tutar ve tarih gir.");return}if(installmentTypes.includes(type)){const count=Number(installmentCount.value);if(!Number.isInteger(count)||count<1||count>600){alert("Lütfen 1 ile 600 arasında geçerli bir ödeme sayısı gir.");return}if(!confirm(count+" ayrı aylık ödeme kaydı oluşturulacak. Devam edilsin mi?"))return;const planId=Date.now().toString()+Math.random().toString(16).slice(2);const [startYear,startMonth,startDay]=dueDate.split("-").map(Number);for(let i=0;i<count;i++){monthlyPayments.push({id:planId+"-"+(i+1),planId,type,payment:paymentTypes[type],amount,dueDate:monthlyDate(dueDate,i),paid:false,installmentNumber:i+1,totalInstallments:count,originalDay:startDay,startYear,startMonth})}saveMonthlyPayments()}else{expenses.push({id:Date.now().toString()+Math.random().toString(16).slice(2),type,payment:paymentTypes[type],amount,dueDate,paid:false,installmentCount:null,remainingInstallments:null});saveExpenses()}renderExpenses();expenseForm.reset();updateFields();alert("Gider kaydedildi!")});
+updateFields();renderExpenses();
 </script>
 <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function () {
-      navigator.serviceWorker.register("./service-worker.js")
-        .then(function () {
-          console.log("Service worker kaydedildi.");
-        })
-        .catch(function (error) {
-          console.error("Service worker hatası:", error);
-        });
-    });
-  }
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./service-worker.js").then(function(){console.log("Service worker kaydedildi.")}).catch(function(error){console.error("Service worker hatası:",error)})})}
+</script>
+<script>
+const SUPABASE_URL="https://ibdujghlggnijhgbokjk.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_hge3lNoPhKjlINt79_OyXQ_St0O4pMJ";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const authCard=$("authCard"),signedInCard=$("signedInCard"),authEmail=$("authEmail"),authPassword=$("authPassword"),authMessage=$("authMessage");
+function showSignedIn(session){if(session&&session.user){authCard.classList.add("hidden");signedInCard.classList.remove("hidden");$("signedInMessage").textContent="Giriş yapıldı: "+session.user.email}else{authCard.classList.remove("hidden");signedInCard.classList.add("hidden")}}
+function showRecoveryForm(){authCard.classList.add("hidden");signedInCard.classList.add("hidden");$("resetPasswordCard").classList.remove("hidden");$("resetPasswordMessage").textContent="Yeni şifreni belirleyebilirsin."}
+supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==="PASSWORD_RECOVERY"){showRecoveryForm();return}if(event==="SIGNED_IN"||event==="INITIAL_SESSION"||event==="TOKEN_REFRESHED"){if(!$("resetPasswordCard").classList.contains("hidden"))return;showSignedIn(session)}if(event==="SIGNED_OUT")showSignedIn(null)});
+(async()=>{const {data}=await supabaseClient.auth.getSession();if(data.session&&!location.hash.includes("type=recovery"))showSignedIn(data.session);if(location.hash.includes("type=recovery")){setTimeout(()=>{if(!$("resetPasswordCard").classList.contains("hidden"))return;showRecoveryForm()},500)}})();
+$("signUpButton").addEventListener("click",async()=>{const email=authEmail.value.trim(),password=authPassword.value;if(!email||!password){authMessage.textContent="Lütfen e-posta adresini ve şifreni gir.";return}if(password.length<6){authMessage.textContent="Şifren en az 6 karakter olmalı.";return}authMessage.textContent="Kayıt işlemi yapılıyor...";const {data,error}=await supabaseClient.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});if(error){authMessage.textContent="Kayıt hatası: "+error.message;return}authMessage.textContent=data.user&&!data.session?"Kayıt oluşturuldu. E-posta kutunu kontrol et ve doğrulama bağlantısına tıkla.":"Kayıt başarılı!"});
+$("signInButton").addEventListener("click",async()=>{const email=authEmail.value.trim(),password=authPassword.value;if(!email||!password){authMessage.textContent="Lütfen e-posta adresini ve şifreni gir.";return}authMessage.textContent="Giriş yapılıyor...";const {error}=await supabaseClient.auth.signInWithPassword({email,password});if(error){authMessage.textContent="Giriş hatası: "+error.message;return}authMessage.textContent="Giriş başarılı!"});
+$("forgotPasswordButton").addEventListener("click",async()=>{const email=authEmail.value.trim();if(!email){authMessage.textContent="Önce e-posta adresini yaz, sonra şifremi unuttum düğmesine bas.";authEmail.focus();return}authMessage.textContent="Şifre yenileme e-postası gönderiliyor...";const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error){authMessage.textContent="E-posta gönderilemedi: "+error.message;return}authMessage.textContent="Şifre yenileme bağlantısı gönderildi. E-postanı kontrol et."});
+$("updatePasswordButton").addEventListener("click",async()=>{const password=$("newPassword").value,confirmPassword=$("confirmNewPassword").value,message=$("resetPasswordMessage");if(password.length<6){message.textContent="Şifre en az 6 karakter olmalı.";return}if(password!==confirmPassword){message.textContent="Girdiğin şifreler aynı değil.";return}message.textContent="Şifre güncelleniyor...";const {error}=await supabaseClient.auth.updateUser({password});if(error){message.textContent="Şifre güncellenemedi: "+error.message;return}message.textContent="Şifren başarıyla güncellendi. Şimdi yeni şifrenle giriş yapabilirsin.";$("resetPasswordCard").classList.add("hidden");authCard.classList.remove("hidden");signedInCard.classList.add("hidden");$("authPassword").value="";history.replaceState(null,"",location.pathname+location.search)});
+$("signOutButton").addEventListener("click",async()=>{const {error}=await supabaseClient.auth.signOut();if(error){$("signedInMessage").textContent="Çıkış yapılamadı: "+error.message;return}authMessage.textContent="Oturum kapatıldı."});
 </script>
 </body>
 </html>
